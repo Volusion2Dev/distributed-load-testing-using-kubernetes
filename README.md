@@ -64,7 +64,7 @@ After you deploy the Locust master, you can access the web interface using the p
 
 The next component of the deployment includes the Locust workers, which execute the load testing tasks described above. The Locust workers are deployed by a single deployment that creates multiple pods. The pods are spread out across the Kubernetes cluster. Each pod uses environment variables to control important configuration information such as the hostname of the system under test and the hostname of the Locust master. 
 
-After the Locust workers are deployed, you can return to the Locust master web interface and see that the number of slaves corresponds to the number of deployed workers.
+After the Locust workers are deployed, you can return to the Locust master web interface and see that the number of workers corresponds to the number of deployed workers.
 
 ## Setup
 

@@ -15,28 +15,56 @@
 # limitations under the License.
 
 
-import uuid
-
-from datetime import datetime
-from locust import HttpLocust, TaskSet, task
+from locust import HttpUser, TaskSet, task
 
 
 class MetricsTaskSet(TaskSet):
-    _deviceid = None
-
     def on_start(self):
-        self._deviceid = str(uuid.uuid4())
+        self.client.headers = dict(
+            {"Authorization": "XXXX", "Content-Type": "application/json"})
 
     @task(1)
-    def login(self):
+    def get_carts(self):
+        self.client.get(
+            '/cart-service/stores/12345/cart',
+            headers=self.client.headers
+        )
+
+    @task(1)
+    def post_cart(self):
         self.client.post(
-            '/login', {"deviceid": self._deviceid})
+            "/cart-service/stores/12345/cart",
+            json={
+                "ipAddress": "127.0.0.1",
+                "shopperId": "hello",
+                "phone": "512-123-4567",
+                "cartItems": [
+                    {
+                        "productId": "abc",
+                        "quantity": 1,
+                        "giftWrapNote": "best wishes for you and yours",
+                        "price": "10.00"
+                    },
+                    {
+                        "productId": "def",
+                        "quantity": 2
+                    }
+                ],
+                "cartDiscounts": [
+                    {
+                        "discountCode": "all"
+                    },
+                    {
+                        "discountCode": "your"
+                    },
+                    {
+                        "discountCode": "base"
+                    }
+                ]
+            },
+            headers=self.client.headers
+        )
 
-    @task(999)
-    def post_metrics(self):
-        self.client.post(
-            "/metrics", {"deviceid": self._deviceid, "timestamp": datetime.now()})
 
-
-class MetricsLocust(HttpLocust):
-    task_set = MetricsTaskSet
+class MetricsLocust(HttpUser):
+    tasks = [MetricsTaskSet]
